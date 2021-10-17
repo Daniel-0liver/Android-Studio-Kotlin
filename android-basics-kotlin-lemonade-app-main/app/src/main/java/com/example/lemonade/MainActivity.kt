@@ -67,9 +67,11 @@ class MainActivity : AppCompatActivity() {
         setViewElements()
         lemonImage!!.setOnClickListener {
             // TODO: call the method that handles the state when the image is clicked
+            clickLemonImage()
         }
         lemonImage!!.setOnLongClickListener {
             // TODO: replace 'false' with a call to the function that shows the squeeze count
+            showSnackbar()
             false
         }
     }
@@ -111,6 +113,27 @@ class MainActivity : AppCompatActivity() {
 
         // TODO: lastly, before the function terminates we need to set the view elements so that the
         //  UI can reflect the correct state
+
+        if (lemonadeState == SELECT) {
+            lemonadeState = SQUEEZE
+            lemonSize = lemonTree.pick()
+            squeezeCount = 0
+        }else if (lemonadeState == SQUEEZE) {
+            squeezeCount += 1
+            lemonSize -=1
+            if (lemonSize == 0){
+                lemonadeState = DRINK
+            }else {
+                lemonadeState = SQUEEZE
+            }
+        }else if (lemonadeState == DRINK) {
+            lemonadeState = RESTART
+            lemonSize = -1
+        }else {
+            lemonadeState = SELECT
+        }
+
+        setViewElements()
     }
 
     /**
@@ -120,12 +143,26 @@ class MainActivity : AppCompatActivity() {
         val textAction: TextView = findViewById(R.id.text_action)
         // TODO: set up a conditional that tracks the lemonadeState
 
+        when(lemonadeState) {
+            SELECT -> updateUi("Click to select the lemon!", R.drawable.lemon_tree)
+            SQUEEZE -> updateUi("Click to juice the lemon!", R.drawable.lemon_squeeze)
+            DRINK -> updateUi("Click to drink your lemonade!", R.drawable.lemon_drink)
+            RESTART -> updateUi("Click to restart!", R.drawable.lemon_restart)
+        }
+
         // TODO: for each state, the textAction TextView should be set to the corresponding string from
         //  the string resources file. The strings are named to match the state
 
         // TODO: Additionally, for each state, the lemonImage should be set to the corresponding
         //  drawable from the drawable resources. The drawables have the same names as the strings
         //  but remember that they are drawables, not strings.
+
+    }
+
+    fun updateUi(displayText: String, displayImage: Int) {
+        val textAction: TextView = findViewById(R.id.text_action)
+        textAction.setText(displayText)
+        lemonImage?.setImageResource(displayImage)
     }
 
     /**
